@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import { PropTypes } from "prop-types";
 
 const TodoContext = createContext();
@@ -8,6 +8,13 @@ export const TodoProvider = ({ children }) => {
   const [task, setTask] = useState({});
   const [taskInput, setTaskInput] = useState("");
   const [taskID, setTaskId] = useState(0);
+
+  useEffect(() => {
+    if (localStorage.getItem("taskList")) {
+      setTaskList(JSON.parse(localStorage.getItem("taskList")));
+      setTaskId(Math.ceil(localStorage.getItem("taskID")) + 1);
+    }
+  }, []);
 
   const handleAddTask = () => {
     if (!taskInput.trim()) {
@@ -20,30 +27,35 @@ export const TodoProvider = ({ children }) => {
       completed: false
     };
 
-    setTaskId(oldValue => oldValue + 1);
-    console.log(taskID);
+    const newTaskListAdded = [...taskList, newTask];
 
-    setTaskList([...taskList, newTask]);
+    setTaskList(newTaskListAdded);
     setTaskInput("");
+
+    localStorage.setItem("taskID", taskID);
+    localStorage.setItem("taskList", JSON.stringify(newTaskListAdded));
+
+    setTaskId(oldValue => oldValue + 1);
   };
 
   const handleCompleteTask = taskCompleted => {
-    setTaskList(
-      taskList.map(task => {
-        if (task.id === taskCompleted) {
-          return {
-            ...task,
-            completed: !task.completed
-          };
-        }
-      })
-    );
+    const completedTaskList = taskList.map(task => {
+      if (task.id === taskCompleted) {
+        return {
+          ...task,
+          completed: !task.completed
+        };
+      }
+    });
+    setTaskList(completedTaskList);
+    localStorage.setItem("taskList", JSON.stringify(completedTaskList));
   };
 
   const handleRemoveTask = taskDeleteID => {
-    console.log("delete", taskDeleteID);
     const newTaskList = taskList.filter(task => task.id !== taskDeleteID);
     setTaskList(newTaskList);
+
+    localStorage.setItem("taskList", JSON.stringify(newTaskList));
   };
 
   return (
