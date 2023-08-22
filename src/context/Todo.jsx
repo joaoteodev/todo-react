@@ -11,6 +11,11 @@ export const TodoProvider = ({ children }) => {
 
   useEffect(() => {
     if (localStorage.getItem("taskList")) {
+      const localTasks = JSON.parse(localStorage.taskList).filter(
+        task => !!task
+      );
+      localStorage.setItem("taskList", JSON.stringify(localTasks));
+
       setTaskList(JSON.parse(localStorage.getItem("taskList")));
       setTaskId(Math.ceil(localStorage.getItem("taskID")) + 1);
     }
@@ -40,13 +45,14 @@ export const TodoProvider = ({ children }) => {
 
   const handleCompleteTask = taskCompleted => {
     const completedTaskList = taskList.map(task => {
-      if (task.id === taskCompleted) {
-        return {
-          ...task,
-          completed: !task.completed
-        };
-      }
+      task.id === taskCompleted
+        ? {
+            ...task,
+            completed: !task.completed
+          }
+        : task;
     });
+
     setTaskList(completedTaskList);
     localStorage.setItem("taskList", JSON.stringify(completedTaskList));
   };
