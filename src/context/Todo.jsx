@@ -44,14 +44,9 @@ export const TodoProvider = ({ children }) => {
   };
 
   const handleCompleteTask = taskCompleted => {
-    const completedTaskList = taskList.map(task => {
-      task.id === taskCompleted
-        ? {
-            ...task,
-            completed: !task.completed
-          }
-        : task;
-    });
+    const completedTaskList = taskList.map(task =>
+      task.id === taskCompleted ? { ...task, completed: !task.completed } : task
+    );
 
     setTaskList(completedTaskList);
     localStorage.setItem("taskList", JSON.stringify(completedTaskList));
@@ -59,8 +54,8 @@ export const TodoProvider = ({ children }) => {
 
   const handleRemoveTask = taskDeleteID => {
     const newTaskList = taskList.filter(task => task.id !== taskDeleteID);
-    setTaskList(newTaskList);
 
+    setTaskList(newTaskList);
     localStorage.setItem("taskList", JSON.stringify(newTaskList));
   };
 
